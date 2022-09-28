@@ -1,8 +1,9 @@
+import { botDB } from "../models"
 
-
-export const getInvites = async (req, res)=> {
+export const getBot = async (req, res)=> {
   try{
-    res.send({name: "David", age: 18})
+    const bot = await botDB.findById('843185929002025030')
+    res.send(bot)
   }catch{
     console.log("err")
   }

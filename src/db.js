@@ -1,6 +1,6 @@
-// import { connect } from "mongoose"
-// import { connectionDB } from "./config.js"
+import { connect } from "mongoose"
+import { connectionDB } from "./config.js"
 
-// connect(connectionDB).then(()=> {
-//   console.log("Coneccion exitosa.")
-// }).then((err)=> console.error("Error db: ", err))
+connect(connectionDB).then(()=> {
+  console.log("Coneccion exitosa.")
+}).then((err)=> console.error("Error db: ", err))
