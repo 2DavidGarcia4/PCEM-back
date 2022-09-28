@@ -1,4 +1,6 @@
-import { config } from "dotenv"
+const { config } = require("dotenv")
 config()
 
-export const connectionDB = process.env.MONGOOSE
+const connectionDB = process.env.MONGOOSE
+
+module.exports = {connectionDB}

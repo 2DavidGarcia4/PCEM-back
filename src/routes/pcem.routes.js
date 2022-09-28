@@ -1,5 +1,5 @@
-import { Router } from "express"
-import { getBot } from "../controllers/pcem.controllers.js"
+const { Router } = require("express")
+const { getBot } = require("../controllers/pcem.controllers.js")
 
 const router = Router()
 
@@ -9,4 +9,4 @@ router.get("/", (req, res)=> {
 
 router.get("/bot", getBot)
 
-export default router
+module.exports = router

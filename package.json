@@ -2,8 +2,8 @@
   "name": "pcem-back",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "type": "module",
+  "main": "src/index.js",
+  "type": "commonjs",
   "scripts": {
     "dev": "nodemon src",
     "start": "node src"
