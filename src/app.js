@@ -1,10 +1,9 @@
-require("./db.js")
-const express = require("express")
-const routes = require("./routes/pcem.routes.js")
+import "./db.js"
+import express from "express"
+import { router } from "./routes/pcem.routes.js"
 
-const app = express()
+export const app = express()
 app.use(express.json())
 
-app.use(routes)
+app.use(router)
 
-module.exports = {app}
