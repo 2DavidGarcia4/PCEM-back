@@ -1,7 +1,5 @@
-const { config } = require("dotenv")
+import { config } from "dotenv"
 config()
 
-const connectionDB = process.env.MONGOOSE
-const pcemToken = process.env.TOKEN_BOT
-
-module.exports = { connectionDB, pcemToken }
+export const connectionDB = process.env.MONGOOSE
+export const pcemToken = process.env.TOKEN_BOT

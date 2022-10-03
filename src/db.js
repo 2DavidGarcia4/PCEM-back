@@ -1,5 +1,5 @@
-const { connect } = require("mongoose")
-const { connectionDB } = require("./config.js")
+import { connect } from "mongoose"
+import { connectionDB } from "./config.js"
 
 connect(connectionDB).then(()=> {
   console.log("Coneccion exitosa.")

@@ -1,8 +1,6 @@
-const { Schema, model } = require("mongoose")
+import { Schema, model } from "mongoose"
 
-const botDB = model("1botdb", new Schema({
+export const botDB = model("1botdb", new Schema({
   _id: {type: String, required: true},
   datos: {type: Object, required: true}
 }))
-
-module.exports = { botDB }

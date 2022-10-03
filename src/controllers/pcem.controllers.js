@@ -1,6 +1,6 @@
-const { botDB } = require("../models/index.js")
-const  { pcemToken } = require("../config.js")
-const { Client } = require("discord.js")
+import { botDB } from "../models/index.js"
+import  { pcemToken } from "../config.js"
+import { Client } from "discord.js"
 
 const client = new Client({
   intents: 131071, 
@@ -15,7 +15,7 @@ client.on('ready', ()=> {
 
 client.login(pcemToken)
 
-const getBot = async (req, res)=> {
+export const getBot = async (req, res)=> {
   try{
     const bot = await botDB.findById('843185929002025030')
     res.send(bot)
@@ -24,7 +24,7 @@ const getBot = async (req, res)=> {
   }
 }
 
-const getServer = async (req, res) => {
+export const getServer = async (req, res) => {
   const { id } = req.params
   // console.log(id)
   
@@ -43,6 +43,3 @@ const getServer = async (req, res) => {
     res.send('Error ID')
   }
 }
-
-
-module.exports = { getBot, getServer }
