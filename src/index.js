@@ -1,4 +1,5 @@
 import { app } from "./app.js"
+import { port } from "./config.js"
 
-app.listen(4000)
-console.log("Server in running port: 4000")
+app.listen(port)
+console.log('Server in running port:', port)
