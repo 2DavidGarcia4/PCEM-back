@@ -6,15 +6,17 @@ router.get('/', services.getBot)
 
 //? Logs
 router.route('/logs')
-  .get(getBotLogs)
-  .put(updateBotLogs)
-  .post(addBotLog)
-  .delete(deleteBotLog)
+  .get(services.getBotLogs)
+  .put(services.updateBotLogs)
+  .post(services.addBotLog)
+  .delete(services.deleteBotLog)
 
 
 //? Auto moderation
-router.get('/autoModeration', getBotAutoModeration)
+router.get('/autoModeration', services.getBotAutoModeration)
 
 router.route('/autoModeration/:type')
-  .post(addBotAutoModeration)
-  .delete(deleteBotAutoModeration)
+  .post(services.addBotAutoModeration)
+  .delete(services.deleteBotAutoModeration)
+
+module.exports = router
