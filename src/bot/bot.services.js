@@ -14,7 +14,7 @@ const userLogin = async (req, res)=> {
 
 const getBot = async (req, res) => {
   try {
-    const bot = botControllers.getBot()
+    const bot = await botControllers.getBotDb()
     sendResponse(res, bot)
 
   } catch (error) {
@@ -22,9 +22,9 @@ const getBot = async (req, res) => {
   }
 }
 
-const getBotLogs = (req, res) => {
+const getBotLogs = async (req, res) => {
   try {
-    const logs = botControllers.getBotLogs()
+    const { logs } = await botControllers.getBotDb()
     sendResponse(res, logs)
 
   } catch (error) {
@@ -32,77 +32,119 @@ const getBotLogs = (req, res) => {
   }
 }
 
-const updateBotLogs = async (req, res) => {
-  if(Object.keys(req.body).some(s=> !Object.keys(botDB.logs).includes(s))){
-    res.send({message: 'a property does not exist'})
-  }else{
-    botDB.logs = {...botDB.logs, ...req.body}
-    await PCEMbotDB.findByIdAndUpdate(generalData.botId, {logs: botDB.logs})
-    res.send({message: 'logs update'})
+const addBotLog = async (req, res) => {
+  try {
+    let { logs } = await botControllers.getBotDb()
+    logs = {...logs, ...req.body}
+    // await PCEMbotDB.findByIdAndUpdate(generalData.botId, {logs})
+    const data = await botControllers.updateBotLogs(logs)
+    res.send({message: 'add new logs update', data})
+    
+  } catch (error) {
+    sendError(res, error)
   }
 }
 
-const addBotLog = async (req, res) => {
-  if(typeof req.body == 'object'){
-    botDB.logs = {...botDB.logs, ...req.body}
-    await PCEMbotDB.findByIdAndUpdate(generalData.botId, {logs: botDB.logs})
-    res.send({message: 'add new logs update'})
-  }else{
-    res.send({message: 'the body is not a object'})
+const updateBotLogs = async (req, res) => {
+  try {
+    let { logs } = await botControllers.getBotDb()
+    if(Object.keys(req.body).some(s=> !Object.keys(logs).includes(s))){
+      sendResponse(res, {message: 'a property does not exist'}, 404)
+    }else{
+      logs = {...logs, ...req.body}
+      // await PCEMbotDB.findByIdAndUpdate(generalData.botId, {logs: botDB.logs})
+      const data = await botControllers.updateBotLogs(logs)
+      sendResponse(res, {message: 'logs update', data})
+    }
+
+  } catch (error) {
+    sendError(res, error)
   }
 }
 
 const deleteBotLog = async (req, res) => {
+  try {
+    const { logs: delLogs } = req.body
+    if(!delLogs) return res.send({message: 'logs property not found on object', fields: {logs: 'logName or [logName, logName]'}})
+    let { logs } = await botControllers.getBotDb()
+    
+    if(Array.isArray(delLogs)){
+      delete logs[delLogs]
+      delLogs.forEach(log=> {
+        delete logs[log]
+      })
+      const data = await botControllers.updateBotLogs(logs)
+      sendResponse(res, {message: 'delete logs', data}, 201)
 
-  if(!Object.keys(req.body).some(s=> s=='log')) return res.send({message: 'log property not found on object'})
-  if(!req.body['log']) return res.send({message: 'log property value does not exist'})
-
-  delete botDB.logs[req.body['log']]
-  console.log(botDB.logs)
-  await PCEMbotDB.findByIdAndUpdate(generalData.botId, {logs: botDB.logs})
-  res.send({message: 'delete log'})
+    }else{
+      delete logs[delLogs]
+      const data = await botControllers.updateBotLogs(logs)
+      sendResponse(res, {message: 'delete log', data}, 201)
+    }
+  
+    
+  } catch (error) {
+    sendError(res, error)
+  }
 }
 
-const getBotAutoModeration = (req, res) => {
-  if(botDB.autoModeration) res.send(botDB.autoModeration)
-  else sendMessage(res, 'auto moderation not found')
+const getBotAutoModeration = async (req, res) => {
+  try {
+    const { autoModeration } = await botControllers.getBotDb()
+    sendResponse(res, autoModeration)
+
+  } catch (error) {
+    sendError(res, error)
+  }
 }
 
 const addBotAutoModeration = async (req, res) => {
-  const { type } = req.params, { id } = req.body
-
-  if(!['ignoreCategories', 'ignoreChannels'].some(s=> s==type)) return sendMessage(res, 'auto moderation type is invalid, use ignoreCategories or ignoreChannels')
-  if(!id) return sendMessage(res, 'id value not found or property does not exist')
+  try {
+    const { type } = req.params, { channelId } = req.body
+    let { autoModeration } = await botControllers.getBotDb()
   
-  if(type == 'ignoreCategories'){
-    botDB.autoModeration[type].push(id)
-    await PCEMbotDB.findByIdAndUpdate(generalData.botId, {autoModeration: botDB.autoModeration})
-    sendMessage(res, 'new category added')
-  }
+    if(!['ignoreCategories', 'ignoreChannels'].some(s=> s==type)) return sendResponse(res, {message: 'auto moderation type is invalid, use ignoreCategories or ignoreChannels'})
+    if(!channelId) return sendResponse(res, {message: 'id value not found or property does not exist'})
 
-  if(type == 'ignoreChannels'){
-    botDB.autoModeration[type].push(id)
-    await PCEMbotDB.findByIdAndUpdate(generalData.botId, {autoModeration: botDB.autoModeration})
-    sendMessage(res, 'new channel added')
+    if(type == 'ignoreCategories'){
+      autoModeration[type].push(channelId)
+      const data = await botControllers.updateBotAutoModeration(autoModeration)
+      sendResponse(res, {message: 'new category added', data})
+    }
+  
+    if(type == 'ignoreChannels'){
+      autoModeration[type].push(channelId)
+      const data = await botControllers.updateBotAutoModeration(autoModeration)
+      sendResponse(res, {message: 'new channel added', data})
+    }
+    
+  } catch (error) {
+    sendError(res, error)
   }
 }
 
 const deleteBotAutoModeration = async (req, res) => {
-  const { type } = req.params, { id } = req.body
-
-  if(!['ignoreCategories', 'ignoreChannels'].some(s=> s==type)) return sendMessage(res, 'auto moderation type is invalid, use ignoreCategories or ignoreChannels')
-  if(!id) return sendMessage(res, 'id value not found or property does not exist')
+  try {
+    const { type } = req.params, { channelId } = req.body
+    let { autoModeration } = await botControllers.getBotDb()
   
-  if(type == 'ignoreCategories'){
-    botDB.autoModeration[type].splice(botDB.autoModeration[type].findIndex(f=> f==id), 1)
-    await PCEMbotDB.findByIdAndUpdate(generalData.botId, {autoModeration: botDB.autoModeration})
-    sendMessage(res, 'deleted category')
-  }
-
-  if(type == 'ignoreChannels'){
-    botDB.autoModeration[type].splice(botDB.autoModeration[type].findIndex(f=> f==id), 1)
-    await PCEMbotDB.findByIdAndUpdate(generalData.botId, {autoModeration: botDB.autoModeration})
-    sendMessage(res, 'deleted channel')
+    if(!['ignoreCategories', 'ignoreChannels'].some(s=> s==type)) return sendResponse(res, {message: 'auto moderation type is invalid, use ignoreCategories or ignoreChannels'})
+    if(!channelId) return sendResponse(res, {message: 'id value not found or property does not exist'})
+    
+    if(type == 'ignoreCategories'){
+      autoModeration[type].splice(autoModeration[type].findIndex(f=> f==channelId), 1)
+      const data = await botControllers.updateBotAutoModeration(autoModeration)
+      sendResponse(res, {message: 'deleted category', data})
+    }
+  
+    if(type == 'ignoreChannels'){
+      autoModeration[type].splice(autoModeration[type].findIndex(f=> f==channelId), 1)
+      const data = await botControllers.updateBotAutoModeration(autoModeration)
+      sendResponse(res, {message: 'deleted channel', data})
+    }
+    
+  } catch (error) {
+    sendError(res, error)
   }
 }
 
