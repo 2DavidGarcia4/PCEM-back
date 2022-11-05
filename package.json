@@ -4,6 +4,9 @@
   "description": "Back end de PCEM.",
   "main": "src/index.js",
   "type": "commonjs",
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "dev": "nodemon src",
     "start": "node src"
