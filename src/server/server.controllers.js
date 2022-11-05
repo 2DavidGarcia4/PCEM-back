@@ -11,7 +11,7 @@ Bot.on('ready', () => {
   server = Bot.guilds.cache.get(serverId)
 })
 
-Bot.login(pcemToken)
+Bot.login(pcemToken).catch(err=> console.log('Error con el login:', err))
 
 const userLogin = (userId) => Bot.users.fetch(userId, {force: true})
 
