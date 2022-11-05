@@ -23,13 +23,12 @@ const getBot = async (req, res) => {
 }
 
 const getBotLogs = (req, res) => {
-  if(botDB.logs) res.send(botDB.logs)
-  else res.send({message: 'logs not found'})
   try {
     const logs = botControllers.getBotLogs()
+    sendResponse(res, logs)
 
   } catch (error) {
-    
+    sendError(res, error)
   }
 }
 
@@ -113,6 +112,7 @@ module.exports = {
   getBot,
   getBotLogs,
   addBotLog,
+  updateBotLogs,
   deleteBotLog,
   getBotAutoModeration,
   addBotAutoModeration,

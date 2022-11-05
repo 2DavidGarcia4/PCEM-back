@@ -1,18 +1,11 @@
-const { Router } = require("express")
-const controllers = require('./bot.services')
-
-export const router = Router()
-
-router.get('/', getPCEM)
-
-router.get('/login/:id', userLogin)
+const router = require("express").Router()
+const services = require('./bot.services')
 
 
-//! Bot
-router.get('/bot', getBot)
+router.get('/', services.getBot)
 
 //? Logs
-router.route('/bot/logs')
+router.route('/logs')
   .get(getBotLogs)
   .put(updateBotLogs)
   .post(addBotLog)
@@ -20,8 +13,8 @@ router.route('/bot/logs')
 
 
 //? Auto moderation
-router.get('/bot/autoModeration', getBotAutoModeration)
+router.get('/autoModeration', getBotAutoModeration)
 
-router.route('/bot/autoModeration/:type')
+router.route('/autoModeration/:type')
   .post(addBotAutoModeration)
   .delete(deleteBotAutoModeration)
