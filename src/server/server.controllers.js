@@ -2,7 +2,7 @@ const { Client } = require("discord.js");
 const { pcemToken } = require("../config");
 const { serverId } = require("../db");
 
-const Bot = new Client()
+const Bot = new Client({intents: 131071})
 let server = {}
 
 Bot.on('ready', () => {
@@ -23,6 +23,3 @@ module.exports = {
   getServer,
   getOwner
 }
-
-
-
