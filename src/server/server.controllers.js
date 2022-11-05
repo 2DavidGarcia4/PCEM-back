@@ -1,7 +1,6 @@
 const { Client } = require("discord.js");
 const { pcemToken } = require("../config");
-const { botId, serverId } = require("../db");
-const { PCEMbotDB } = require("../models");
+const { serverId } = require("../db");
 
 const Bot = new Client()
 let server = {}
