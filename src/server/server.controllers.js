@@ -3,7 +3,7 @@ const { pcemToken } = require("../config");
 const { botId, serverId } = require("../db");
 const { PCEMbotDB } = require("../models");
 
-const Bot = new Client({intents: 131071})
+const Bot = new Client()
 let server = {}
 
 Bot.on('ready', () => {
