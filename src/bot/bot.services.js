@@ -1,58 +1,39 @@
-import { PCEMbotDB } from "../models/index.js"
-import  { pcemToken } from "../config.js"
-import { Client } from "discord.js"
-import { generalData } from "../db.js"
-import { sendMessage } from "../utils/index.js"
+const botControllers = require("./bot.controllers")
+const serverControllers = require("../server/server.controllers")
+const { sendResponse, sendError } = require("../utils")
 
-const client = new Client({ intents: 131071 })
+const userLogin = async (req, res)=> {
+  try {
+    const { id } = req.params, user = await serverControllers.userLogin(id)
+    sendResponse(res, user)
 
-let botDB = undefined
-
-client.on('ready', ()=> {
-  console.log('Bot activo')
-  PCEMbotDB.findById(generalData.botId).then(res=> {
-    botDB = res
-  }).catch((err) => console.error('Error en obtener botDB', err))
-})
-
-client.login(pcemToken)
-
-export const getPCEM = (req, res) => {
-  try{
-    res.send(client.guilds.cache.get(generalData.serverId))
-  }catch{
-    res.send({message: 'Server not found'})
+  } catch (error) {
+    sendError(res, error)
   }
 }
 
-export const userLogin = (req, res)=> {
-  const { id } = req.params
-  client.users.fetch(id).then((user)=> {
-    res.send(user)
-  }).catch(()=> {
-    res.status(400).send({message: 'User not found'})
-  })
-}
+const getBot = async (req, res) => {
+  try {
+    const bot = botControllers.getBot()
+    sendResponse(res, bot)
 
-export const getBot = async (req, res) => {
-  if(botDB){
-    res.send(botDB)
-  }else{
-    PCEMbotDB.findById(generalData.botId).then(res=> {
-      res.send(res)
-      botDB = res
-    }).catch(()=> {
-      res.send({message: 'bot not found'})
-    })
+  } catch (error) {
+    sendError(res, error)
   }
 }
 
-export const getBotLogs = (req, res) => {
+const getBotLogs = (req, res) => {
   if(botDB.logs) res.send(botDB.logs)
   else res.send({message: 'logs not found'})
+  try {
+    const logs = botControllers.getBotLogs()
+
+  } catch (error) {
+    
+  }
 }
 
-export const updateBotLogs = async (req, res) => {
+const updateBotLogs = async (req, res) => {
   if(Object.keys(req.body).some(s=> !Object.keys(botDB.logs).includes(s))){
     res.send({message: 'a property does not exist'})
   }else{
@@ -62,7 +43,7 @@ export const updateBotLogs = async (req, res) => {
   }
 }
 
-export const addBotLog = async (req, res) => {
+const addBotLog = async (req, res) => {
   if(typeof req.body == 'object'){
     botDB.logs = {...botDB.logs, ...req.body}
     await PCEMbotDB.findByIdAndUpdate(generalData.botId, {logs: botDB.logs})
@@ -72,7 +53,7 @@ export const addBotLog = async (req, res) => {
   }
 }
 
-export const deleteBotLog = async (req, res) => {
+const deleteBotLog = async (req, res) => {
 
   if(!Object.keys(req.body).some(s=> s=='log')) return res.send({message: 'log property not found on object'})
   if(!req.body['log']) return res.send({message: 'log property value does not exist'})
@@ -83,12 +64,12 @@ export const deleteBotLog = async (req, res) => {
   res.send({message: 'delete log'})
 }
 
-export const getBotAutoModeration = (req, res) => {
+const getBotAutoModeration = (req, res) => {
   if(botDB.autoModeration) res.send(botDB.autoModeration)
   else sendMessage(res, 'auto moderation not found')
 }
 
-export const addBotAutoModeration = async (req, res) => {
+const addBotAutoModeration = async (req, res) => {
   const { type } = req.params, { id } = req.body
 
   if(!['ignoreCategories', 'ignoreChannels'].some(s=> s==type)) return sendMessage(res, 'auto moderation type is invalid, use ignoreCategories or ignoreChannels')
@@ -107,7 +88,7 @@ export const addBotAutoModeration = async (req, res) => {
   }
 }
 
-export const deleteBotAutoModeration = async (req, res) => {
+const deleteBotAutoModeration = async (req, res) => {
   const { type } = req.params, { id } = req.body
 
   if(!['ignoreCategories', 'ignoreChannels'].some(s=> s==type)) return sendMessage(res, 'auto moderation type is invalid, use ignoreCategories or ignoreChannels')
@@ -124,4 +105,16 @@ export const deleteBotAutoModeration = async (req, res) => {
     await PCEMbotDB.findByIdAndUpdate(generalData.botId, {autoModeration: botDB.autoModeration})
     sendMessage(res, 'deleted channel')
   }
+}
+
+
+module.exports = {
+  userLogin,
+  getBot,
+  getBotLogs,
+  addBotLog,
+  deleteBotLog,
+  getBotAutoModeration,
+  addBotAutoModeration,
+  deleteBotAutoModeration
 }

@@ -1,10 +1,13 @@
-import "./db.js"
-import express from "express"
-import { router } from "./routes/pcem.routes.js"
-import cors from "cors"
+require("./db")
+const express = require("express")
+const cors = require("cors")
 
-export const app = express()
-app.use(cors())
+const serverRoutes = require("./server/server.routes")
+
+const app = express()
 app.use(express.json())
+app.use(cors())
 
-app.use(router)
+app.use('/server', serverRoutes)
+
+module.exports = { app }
